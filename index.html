@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Webcam Server</title>
+        <style>
+            body{
+                display: grid;
+                grid-template-columns: 100%;
+                grid-template-rows: 15% 80%;
+            }
+
+            header{
+                width: 100%;
+                display: flex;
+                justify-content: center;
+                justify-self: flex-start;
+            }
+
+            main{
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+            }
+
+            p{
+                padding: 0;
+                margin: 0;
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <h1 id="headerText">MAL-HOUSE CCTV - IP: 🔴</h1>
+        </header>
+
+        <main>
+            <img id="image">
+            <p id="camNum">View: Camera 0</p>
+        </main>
+
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.js"></script>
+        <script>
+            const imageDiv = document.getElementById('image');
+            const headerTextDiv = document.getElementById('headerText');
+            const camNumDiv = document.getElementById('camNum');
+            const socket = io.connect('http://10.0.0.39:80');
+            let ip;
+            let camNum = 0;
+
+            socket.on('connect', () =>{
+
+            });
+
+            socket.on('image-data', (data) =>{
+                //This was causing error with getting image from webcam
+                //`data:${data.mimeType};base64,${data.data}`;
+                imageDiv.src = data.data;
+                imageDiv.style.width = data.width + 'px';
+                imageDiv.style.height = data.height + 'px';
+                camNum = data.cam;
+                camNumDiv.textContent = `View: Camera ${camNum}`;
+            });
+
+            socket.on('ip-data', (data) =>{
+                ip = data.ip;
+                headerTextDiv.textContent = `MAL-HOUSE CCTV - IP: ${ip} 🟢`;
+            });
+        </script>
+    </body>
+</html>
